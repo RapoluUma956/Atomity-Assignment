@@ -1,22 +1,31 @@
 import { useState, useEffect } from "react";
-import { Header }         from "./components/Header";
-import { Sidebar }        from "./components/Sidebar";
-import { DrillChart }     from "./components/DrillChart";
-import { InsightsPanel }  from "./components/InsightsPanel";
-import { useData }        from "./hooks/useData";
+import { Header }        from "./components/Header";
+import { Sidebar }       from "./components/Sidebar";
+import { DrillChart }    from "./components/DrillChart";
+import { InsightsPanel } from "./components/InsightsPanel";
+import { useData }       from "./hooks/useData";
 import type { DateRange, Theme, Platform } from "./tokens";
 import { tokens } from "./tokens";
 
-interface SelectedNode {
-  node:     string;
-  platform: Platform;
-}
+interface SelectedNode { node: string; platform: Platform; }
+
+
+type AnimDir = "enter" | "from-right" | "from-left";
+
+const ANIM_CLASS: Record<AnimDir, string> = {
+  "enter":      "anim-chart-enter",
+  "from-right": "anim-panel-right",
+  "from-left":  "anim-panel-left",
+};
 
 export default function App() {
   const [theme, setTheme]                   = useState<Theme>("dark");
   const [dateRange, setDateRange]           = useState<DateRange>("30d");
   const [activePlatform, setActivePlatform] = useState<Platform | null>(null);
   const [selectedNode, setSelectedNode]     = useState<SelectedNode | null>(null);
+  const [animDir, setAnimDir]               = useState<AnimDir>("enter");
+  // panelKey forces remount → restarts CSS animation on every stage switch
+  const [panelKey, setPanelKey]             = useState(0);
 
   useEffect(() => {
     document.documentElement.classList.toggle("light", theme === "light");
@@ -24,23 +33,41 @@ export default function App() {
 
   const { seedOffset, status } = useData(`overview-${dateRange}`);
 
-  // When platform changes, clear selected node
+  function nextPanel(dir: AnimDir) {
+    setAnimDir(dir);
+    setPanelKey((k) => k + 1);
+  }
+
   function handlePlatformSelect(p: Platform) {
     setActivePlatform((prev) => (prev === p ? null : p));
     setSelectedNode(null);
+    nextPanel("enter");
   }
 
-  // Node bar clicked → show insights
   function handleNodeClick(node: string, platform: Platform) {
+    // Back signal from DrillChart back button
+    if (node === "__back__") {
+      setActivePlatform(null);
+      setSelectedNode(null);
+      nextPanel("enter");
+      return;
+    }
+    // Forward: go to insights
     setSelectedNode({ node, platform });
+    nextPanel("from-right");
   }
 
-  // Back from insights → return to node chart
   function handleBackFromInsights() {
     setSelectedNode(null);
+    nextPanel("from-left");
   }
 
-  // Show insights panel if a node is selected, otherwise show chart
+  function handleDateChange(d: DateRange) {
+    setDateRange(d);
+    setSelectedNode(null);
+    nextPanel("enter");
+  }
+
   const showInsights = selectedNode !== null;
 
   return (
@@ -51,10 +78,10 @@ export default function App() {
       flexDirection: "column",
       transition: "background 0.3s ease",
     }}>
-      {/* Header — full width */}
+      {/* Header */}
       <Header
         dateRange={dateRange}
-        onDateChange={(d) => { setDateRange(d); setSelectedNode(null); }}
+        onDateChange={handleDateChange}
         theme={theme}
         onThemeToggle={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
       />
@@ -62,7 +89,7 @@ export default function App() {
       {/* Body */}
       <div style={{ flex: 1, display: "flex" }}>
 
-        {/* Sidebar — left strip */}
+        {/* Sidebar */}
         <div style={{
           width: 160,
           flexShrink: 0,
@@ -75,7 +102,7 @@ export default function App() {
           />
         </div>
 
-        {/* Main content */}
+        {/* Main */}
         <main style={{
           flex: 1,
           minWidth: 0,
@@ -83,8 +110,9 @@ export default function App() {
           display: "flex",
           flexDirection: "column",
           gap: 14,
+          // clip so sliding panels don't overflow during animation
+          overflow: "hidden",
         }}>
-          {/* API error — non-blocking */}
           {status === "error" && (
             <div role="alert" style={{
               padding: "8px 14px",
@@ -98,14 +126,21 @@ export default function App() {
             </div>
           )}
 
-          {/* Card — swaps between chart and insights */}
-          <div style={{
-            background: tokens.colors.bgPanel,
-            border: `1px solid ${tokens.colors.borderPanel}`,
-            borderRadius: tokens.radius.xl,
-            overflow: "hidden",
-            animation: "fadeSlideIn 0.4s cubic-bezier(0.16,1,0.3,1) both",
-          }}>
+          {/*
+            key={panelKey} → remounts the card on every stage change
+            className     → picks the right entrance animation
+            overflow hidden → clips the slide so nothing bleeds outside
+          */}
+          <div
+            key={panelKey}
+            className={ANIM_CLASS[animDir]}
+            style={{
+              background: tokens.colors.bgPanel,
+              border: `1px solid ${tokens.colors.borderPanel}`,
+              borderRadius: tokens.radius.xl,
+              overflow: "hidden",
+            }}
+          >
             {showInsights ? (
               <InsightsPanel
                 node={selectedNode!.node}

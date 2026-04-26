@@ -9,9 +9,7 @@ import { getOverviewData, getNodeCostData } from "../data";
 import type { BarDatum } from "../data";
 
 // ── Tooltip ───────────────────────────────────────────────────
-function CustomTooltip({
-  active, payload, label, isDollar,
-}: {
+function CustomTooltip({ active, payload, label, isDollar }: {
   active?: boolean;
   payload?: { value: number }[];
   label?: string;
@@ -37,6 +35,17 @@ function CustomTooltip({
   );
 }
 
+// ── Back chevron ──────────────────────────────────────────────
+function ChevronLeft() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  );
+}
+
+// ── Props ─────────────────────────────────────────────────────
 interface DrillChartProps {
   dateRange:      DateRange;
   seedOffset:     number;
@@ -45,49 +54,40 @@ interface DrillChartProps {
   onNodeClick:    (node: string, platform: Platform) => void;
 }
 
+// ── Component ─────────────────────────────────────────────────
 export function DrillChart({
-  dateRange,
-  seedOffset,
-  isLoading,
-  activePlatform,
-  onNodeClick,
+  dateRange, seedOffset, isLoading, activePlatform, onNodeClick,
 }: DrillChartProps) {
-  const [chartData,   setChartData]   = useState<BarDatum[]>([]);
-  const [hoveredBar,  setHoveredBar]  = useState<string | null>(null);
-  const [visible,     setVisible]     = useState(true);
-  const prevPlatformRef               = useRef<Platform | null>(null);
-
   const view: "overview" | "nodes" = activePlatform ? "nodes" : "overview";
   const isDollar = view === "nodes";
 
-  function currentData(): BarDatum[] {
-    if (activePlatform) return getNodeCostData(activePlatform, dateRange);
-    return getOverviewData(dateRange);
-  }
+  // Compute data immediately — no deferred swap
+  const chartData: BarDatum[] = activePlatform
+    ? getNodeCostData(activePlatform, dateRange)
+    : getOverviewData(dateRange);
 
-  function swapData(next: BarDatum[]) {
-    setVisible(false);
-    setTimeout(() => { setChartData(next); setVisible(true); }, 260);
-  }
+  // animationKey forces React to remount the chart wrapper,
+  // replaying the CSS entrance animation cleanly on every change.
+  const [animationKey, setAnimationKey] = useState(1);
+  const prevPlatformRef = useRef<Platform | null>(null);
+  const prevDateRef     = useRef<DateRange>(dateRange);
 
-  // Re-fetch on deps change
   useEffect(() => {
-    swapData(currentData());
-  }, [view, dateRange, seedOffset]); // eslint-disable-line
+    const platformChanged = prevPlatformRef.current !== activePlatform;
+    const dateChanged     = prevDateRef.current !== dateRange;
+    if (platformChanged || dateChanged) {
+      setAnimationKey((k) => k + 1);
+      prevPlatformRef.current = activePlatform;
+      prevDateRef.current     = dateRange;
+    }
+  }, [activePlatform, dateRange, seedOffset]);
 
-  // Platform change
-  useEffect(() => {
-    if (prevPlatformRef.current === activePlatform) return;
-    prevPlatformRef.current = activePlatform;
-    swapData(currentData());
-  }, [activePlatform]); // eslint-disable-line
-
-  // Initial mount
-  useEffect(() => { setChartData(currentData()); }, []); // eslint-disable-line
+  const [hoveredBar, setHoveredBar] = useState<string | null>(null);
 
   // Breadcrumb
-  const breadcrumb: string[] = ["overview"];
-  if (activePlatform) breadcrumb.push(activePlatform);
+  const breadcrumb = activePlatform
+    ? ["overview", activePlatform]
+    : ["overview"];
 
   const sectionLabel = view === "overview"
     ? "Unified overview — all clusters"
@@ -97,12 +97,10 @@ export function DrillChart({
     ? "select a platform on the left to view its nodes"
     : "click any node to view optimization insights";
 
-  // Y-axis formatter
   const yFormatter = isDollar
     ? (v: number) => `$${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`
     : (v: number) => `${v}%`;
 
-  // Label formatter
   const labelFormatter = isDollar
     ? (v: number) => `$${v.toLocaleString()}`
     : (v: number) => `${v}%`;
@@ -110,7 +108,7 @@ export function DrillChart({
   return (
     <section style={{ padding: "24px 28px 28px", display: "flex", flexDirection: "column" }}>
 
-      {/* Breadcrumb */}
+      {/* Breadcrumb — always visible, transitions via color */}
       <nav aria-label="Breadcrumb" style={{ marginBottom: 20 }}>
         <ol style={{ display: "flex", alignItems: "center", gap: 6, listStyle: "none", fontSize: "0.78rem" }}>
           {breadcrumb.map((crumb, i) => {
@@ -121,6 +119,7 @@ export function DrillChart({
                 <span style={{
                   color: isLast ? tokens.colors.accent : tokens.colors.textMuted,
                   fontWeight: isLast ? 600 : 400,
+                  transition: "color 0.35s ease",
                 }}>
                   {crumb}
                 </span>
@@ -138,6 +137,7 @@ export function DrillChart({
         textTransform: "uppercase",
         color: tokens.colors.textMuted,
         marginBottom: 18,
+        transition: "opacity 0.35s ease",
       }}>
         {sectionLabel}
       </p>
@@ -154,11 +154,15 @@ export function DrillChart({
           ))}
         </div>
       ) : (
-        <div style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : "translateY(8px)",
-          transition: "opacity 0.26s ease, transform 0.26s cubic-bezier(0.16,1,0.3,1)",
-        }}>
+        /*
+          key={animationKey} causes React to fully remount this div
+          on every platform/date change, replaying .anim-chart-enter
+          from scratch — clean entrance, no flicker, no data flash.
+        */
+        <div
+          key={animationKey}
+          className="anim-chart-enter"
+        >
           <ResponsiveContainer width="100%" height={300}>
             <BarChart
               data={chartData}
@@ -199,15 +203,9 @@ export function DrillChart({
                 onMouseEnter={(d: { label?: string }) => setHoveredBar(d?.label ?? null)}
                 onMouseLeave={() => setHoveredBar(null)}
                 isAnimationActive
-                animationDuration={550}
-                animationEasing="ease-out"
+                animationDuration={800}
+                animationEasing="ease-in-out"
               >
-                <LabelList
-                  dataKey="value"
-                  position="top"
-                  formatter={labelFormatter}
-                  style={{ fill: tokens.colors.textSecondary, fontSize: 11, fontFamily: "inherit" }}
-                />
                 {chartData.map((entry) => (
                   <Cell
                     key={entry.label}
@@ -229,6 +227,43 @@ export function DrillChart({
       }}>
         {hintText}
       </p>
+
+      {/* Back button — nodes view only */}
+      {view === "nodes" && (
+        <div style={{
+          marginTop: 20,
+          paddingTop: 16,
+          borderTop: `1px solid ${tokens.colors.border}`,
+        }}>
+          <button
+            onClick={() => onNodeClick("__back__", activePlatform!)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "6px 14px",
+              borderRadius: tokens.radius.md,
+              border: `1px solid ${tokens.colors.border}`,
+              background: tokens.colors.bgBtn,
+              color: tokens.colors.textSecondary,
+              cursor: "pointer",
+              fontSize: "0.78rem",
+              fontFamily: "inherit",
+              transition: "background 0.18s ease, color 0.18s ease",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = tokens.colors.bgBtnHover;
+              (e.currentTarget as HTMLElement).style.color = tokens.colors.textPrimary;
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = tokens.colors.bgBtn;
+              (e.currentTarget as HTMLElement).style.color = tokens.colors.textSecondary;
+            }}
+          >
+            <ChevronLeft /> back to overview
+          </button>
+        </div>
+      )}
     </section>
   );
 }

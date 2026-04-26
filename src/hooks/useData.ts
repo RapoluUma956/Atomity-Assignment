@@ -5,7 +5,7 @@ interface CacheEntry {
   fetchedAt:  number;
 }
 
-// Module-level cache — persists across re-renders and navigation
+
 const cache = new Map<string, CacheEntry>();
 const STALE_MS = 5 * 60 * 1000; // 5 minutes
 

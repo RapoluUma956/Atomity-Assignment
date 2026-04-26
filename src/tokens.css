@@ -1,33 +1,26 @@
-/* ── Dark mode (default) ─────────────────────────────────── */
 :root {
-  /* Backgrounds — layered zinc darks */
-  --color-bg:          #111113;
-  --color-bg-panel:    #18181b;
-  --color-bg-surface:  #1e1e23;
-  --color-bg-btn:      #27272a;
-  --color-bg-btn-hover:#3f3f46;
+  --color-bg: #111113;
+  --color-bg-panel: #18181b;
+  --color-bg-surface: #1e1e23;
+  --color-bg-btn: #27272a;
+  --color-bg-btn-hover: #3f3f46;
 
-  /* Single accent — teal */
-  --color-accent:      #2dd4bf;
-  --color-accent-dim:  rgba(45, 212, 191, 0.12);
+  --color-accent: #2dd4bf;
+  --color-accent-dim: rgba(45, 212, 191, 0.12);
   --color-accent-text: #111113;
 
-  /* Borders */
-  --color-border:       rgba(255,255,255,0.07);
-  --color-border-panel: rgba(255,255,255,0.11);
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-panel: rgba(255, 255, 255, 0.11);
 
-  /* Text */
-  --color-text-primary:   #f4f4f5;
-  --color-text-secondary: #a1a1aa;
-  --color-text-muted:     #52525b;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #d4d4d8;
+  --color-text-muted: #a1a1aa;
 
-  /* Chart bars */
-  --color-bar:       rgba(45, 212, 191, 0.70);
+  --color-bar: rgba(45, 212, 191, 0.70);
   --color-bar-hover: #2dd4bf;
-  --color-bar-bg:    rgba(255, 255, 255, 0.04);
+  --color-bar-bg: rgba(255, 255, 255, 0.04);
 
-  /* Radii */
-  --radius-sm:  6px;
+  --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-xl: 22px;
@@ -35,37 +28,47 @@
 
 /* ── Light mode ─────────────────────────────────────────── */
 .light {
-  --color-bg:          #f4f4f5;
-  --color-bg-panel:    #ffffff;
-  --color-bg-surface:  #f1f1f3;
-  --color-bg-btn:      #e4e4e7;
-  --color-bg-btn-hover:#d4d4d8;
+  --color-bg: #f4f4f5;
+  --color-bg-panel: #ffffff;
+  --color-bg-surface: #f1f1f3;
+  --color-bg-btn: #e4e4e7;
+  --color-bg-btn-hover: #d4d4d8;
 
-  --color-accent:      #0d9488;
-  --color-accent-dim:  rgba(13, 148, 136, 0.10);
+  --color-accent: #0d9488;
+  --color-accent-dim: rgba(13, 148, 136, 0.10);
   --color-accent-text: #ffffff;
 
-  --color-border:       rgba(0,0,0,0.07);
-  --color-border-panel: rgba(0,0,0,0.10);
+  --color-border: rgba(0, 0, 0, 0.07);
+  --color-border-panel: rgba(0, 0, 0, 0.10);
 
-  --color-text-primary:   #18181b;
-  --color-text-secondary: #52525b;
-  --color-text-muted:     #a1a1aa;
 
-  --color-bar:       rgba(13, 148, 136, 0.70);
+  --color-text-primary: #09090b;
+  --color-text-secondary: #27272a;
+  --color-text-muted: #52525b;
+
+  --color-bar: rgba(13, 148, 136, 0.70);
   --color-bar-hover: #0d9488;
-  --color-bar-bg:    rgba(0, 0, 0, 0.04);
+  --color-bar-bg: rgba(0, 0, 0, 0.04);
 }
 
 /* ── Base reset ─────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-html { block-size: 100%; }
+html {
+  block-size: 100%;
+}
 
 body {
   background: var(--color-bg);
   color: var(--color-text-primary);
-  font-size: clamp(13px, 1.1vw, 15px);
+  font-size: clamp(15px, 1.3vw, 25px);
+  font-weight: 500;
   font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
   -webkit-font-smoothing: antialiased;
   transition: background 0.3s ease, color 0.3s ease;
@@ -74,19 +77,79 @@ body {
 
 /* ── Reduced motion ─────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }
 
 /* ── Scrollbar ──────────────────────────────────────────── */
-::-webkit-scrollbar        { width: 4px; }
-::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: var(--color-border-panel); border-radius: 99px; }
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-panel);
+  border-radius: 99px;
+}
 
 /* ── Keyframes ──────────────────────────────────────────── */
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+
+/* Chart content enters: fades in + rises slightly */
+@keyframes chartEnter {
+  from {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Panel (insights) enters from the right */
+@keyframes panelEnterRight {
+  from {
+    opacity: 0;
+    transform: translateX(120px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Panel (chart) enters from the left (going back) */
+@keyframes panelEnterLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-120px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Animation utility classes ──────────────────────────── */
+.anim-chart-enter {
+  animation: chartEnter 2.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.anim-panel-right {
+  animation: panelEnterRight 2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.anim-panel-left {
+  animation: panelEnterLeft 2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
