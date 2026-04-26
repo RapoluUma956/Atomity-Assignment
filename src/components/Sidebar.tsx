@@ -1,6 +1,3 @@
-// src/components/Sidebar.tsx
-// Left page-level nav strip. Parent controls width + background.
-
 import { tokens, PLATFORMS, PLATFORM_META } from "../tokens";
 import type { Platform } from "../tokens";
 
