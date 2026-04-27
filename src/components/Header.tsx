@@ -33,6 +33,8 @@ function MoonIcon() {
 export function Header({ dateRange, onDateChange, theme, onThemeToggle }: HeaderProps) {
   return (
     <header
+      role="banner"
+      aria-label="Atomity application header"
       style={{
         display: "flex",
         alignItems: "center",
@@ -63,6 +65,7 @@ export function Header({ dateRange, onDateChange, theme, onThemeToggle }: Header
         {/* Date range pills */}
         <nav
           aria-label="Date range"
+          aria-live="polite"
           style={{
             display: "flex",
             background: tokens.colors.bgSurface,
@@ -83,7 +86,7 @@ export function Header({ dateRange, onDateChange, theme, onThemeToggle }: Header
                   borderRadius: tokens.radius.md,
                   border: "none",
                   cursor: "pointer",
-                  fontSize: "0.8rem",
+                  fontSize: "0.95rem",
                   fontFamily: "inherit",
                   fontWeight: isActive ? 600 : 400,
                   background: isActive ? tokens.colors.accent : "transparent",

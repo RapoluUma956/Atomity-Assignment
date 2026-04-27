@@ -1,52 +1,80 @@
 import { useState, useEffect } from "react";
 
-interface CacheEntry {
-  seedOffset: number;
-  fetchedAt:  number;
-}
+const CACHE_NAME  = "atomity-v1";     
+const STALE_MS    = 5 * 60 * 1000;                 // 5 minutes
+const API_BASE    = "https://jsonplaceholder.typicode.com/posts";
 
-
-const cache = new Map<string, CacheEntry>();
-const STALE_MS = 5 * 60 * 1000; // 5 minutes
-
-export type FetchState = "idle" | "loading" | "success" | "error";
+export type FetchStatus = "idle" | "loading" | "success" | "error";
 
 export function useData(cacheKey: string) {
   const [seedOffset, setSeedOffset] = useState<number>(0);
-  const [status, setStatus]         = useState<FetchState>("idle");
+  const [status, setStatus]         = useState<FetchStatus>("idle");
 
   useEffect(() => {
-    const cached = cache.get(cacheKey);
-    const now    = Date.now();
+    let cancelled = false;
 
-    // Cache hit and not stale → instant, no request
-    if (cached && now - cached.fetchedAt < STALE_MS) {
-      setSeedOffset(cached.seedOffset);
-      setStatus("success");
-      return;
+    async function load() {
+      setStatus("loading");
+
+      // Derive a stable post id from the cache key
+      const postId = (cacheKey.length % 100) + 1;
+      const url    = `${API_BASE}/${postId}`;
+
+      try {
+        const cache = await caches.open(CACHE_NAME);
+
+        const cachedResponse = await cache.match(url);
+
+        if (cachedResponse) {
+          const cachedAt = cachedResponse.headers.get("x-cached-at");
+          const age      = Date.now() - Number(cachedAt);
+
+          if (age < STALE_MS) {
+            const data = await cachedResponse.json();
+            if (!cancelled) {
+              setSeedOffset((data.id * 7) % 100);
+              setStatus("success");
+            }
+            return; 
+          }
+
+          
+          await cache.delete(url);
+        }
+
+        
+        const networkResponse = await fetch(url);
+        if (!networkResponse.ok) throw new Error("Network error");
+
+        const data = await networkResponse.json();
+
+        const responseToCache = new Response(JSON.stringify(data), {
+          headers: {
+            "Content-Type":  "application/json",
+            "x-cached-at":   String(Date.now()), 
+          },
+        });
+
+        await cache.put(url, responseToCache);
+
+        if (!cancelled) {
+          setSeedOffset((data.id * 7) % 100);
+          setStatus("success");
+        }
+
+      } catch {
+        if (!cancelled) {
+          setSeedOffset(0);
+          setStatus("error");
+        }
+      }
     }
 
-    // Cache miss or stale → fetch
-    setStatus("loading");
+    load();
 
-    // JSONPlaceholder: fetch a post whose id is used as a seed offset
-    const id = (cacheKey.length % 100) + 1; // derive a stable id from key
-    fetch(`https://jsonplaceholder.typicode.com/posts/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Network error");
-        return res.json();
-      })
-      .then((data: { id: number }) => {
-        const offset = (data.id * 7) % 100; // deterministic numeric offset
-        cache.set(cacheKey, { seedOffset: offset, fetchedAt: Date.now() });
-        setSeedOffset(offset);
-        setStatus("success");
-      })
-      .catch(() => {
-        // On error: fall back to 0 offset so the UI still renders
-        setSeedOffset(0);
-        setStatus("error");
-      });
+    
+    return () => { cancelled = true; };
+
   }, [cacheKey]);
 
   return { seedOffset, status };

@@ -1,8 +1,3 @@
-declare module '*.css' {
-  const content: string;
-  export default content;
-}
-
 export const tokens = {
   colors: {
     bg:           "var(--color-bg)",

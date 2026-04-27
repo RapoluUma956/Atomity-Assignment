@@ -23,7 +23,7 @@ function MetricCard({ label, value }: { label: string; value: string }) {
       gap: 6,
     }}>
       <span style={{
-        fontSize: "0.65rem",
+        fontSize: "0.8rem",
         fontWeight: 600,
         letterSpacing: "0.1em",
         textTransform: "uppercase",
@@ -32,7 +32,7 @@ function MetricCard({ label, value }: { label: string; value: string }) {
         {label}
       </span>
       <span style={{
-        fontSize: "1.3rem",
+        fontSize: "1.6rem",
         fontWeight: 600,
         color: tokens.colors.textPrimary,
         fontFamily: "inherit",
@@ -66,7 +66,7 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
 
       {/* Breadcrumb */}
       <nav aria-label="Breadcrumb">
-        <ol style={{ display: "flex", alignItems: "center", gap: 6, listStyle: "none", fontSize: "0.78rem" }}>
+        <ol style={{ display: "flex", alignItems: "center", gap: 6, listStyle: "none", fontSize: "0.9rem" }}>
           {breadcrumb.map((crumb, i) => {
             const isLast = i === breadcrumb.length - 1;
             return (
@@ -86,7 +86,7 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
 
       {/* Section label */}
       <p style={{
-        fontSize: "0.68rem",
+        fontSize: "0.82rem",
         fontWeight: 600,
         letterSpacing: "0.1em",
         textTransform: "uppercase",
@@ -115,7 +115,7 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
         borderRadius: tokens.radius.lg,
       }}>
         <span style={{
-          fontSize: "0.72rem",
+          fontSize: "0.85rem",
           fontWeight: 600,
           letterSpacing: "0.08em",
           textTransform: "uppercase",
@@ -124,7 +124,7 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
           Estimated savings
         </span>
         <span style={{
-          fontSize: "1.25rem",
+          fontSize: "1.5rem",
           fontWeight: 700,
           color: tokens.colors.accent,
         }}>
@@ -148,7 +148,7 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
         }}>
           {["Namespace", "Workload", "Issue", "Savings / mo"].map((h) => (
             <span key={h} style={{
-              fontSize: "0.65rem",
+              fontSize: "0.8rem",
               fontWeight: 600,
               letterSpacing: "0.09em",
               textTransform: "uppercase",
@@ -179,16 +179,16 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
               (e.currentTarget as HTMLElement).style.background = "transparent";
             }}
           >
-            <span style={{ fontSize: "0.78rem", color: tokens.colors.textMuted, fontFamily: "inherit" }}>
+            <span style={{ fontSize: "0.9rem", color: tokens.colors.textMuted, fontFamily: "inherit" }}>
               {row.namespace}
             </span>
-            <span style={{ fontSize: "0.78rem", color: tokens.colors.textSecondary }}>
+            <span style={{ fontSize: "0.9rem", color: tokens.colors.textSecondary }}>
               {row.workload}
             </span>
-            <span style={{ fontSize: "0.78rem", color: tokens.colors.textPrimary }}>
+            <span style={{ fontSize: "0.9rem", color: tokens.colors.textPrimary }}>
               {row.issue}
             </span>
-            <span style={{ fontSize: "0.78rem", color: tokens.colors.accent, fontWeight: 600 }}>
+            <span style={{ fontSize: "0.9rem", color: tokens.colors.accent, fontWeight: 600 }}>
               ${row.savings}
             </span>
           </div>
@@ -209,7 +209,7 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
             background: tokens.colors.bgBtn,
             color: tokens.colors.textSecondary,
             cursor: "pointer",
-            fontSize: "0.78rem",
+            fontSize: "0.9rem",
             fontFamily: "inherit",
             transition: "background 0.18s ease, color 0.18s ease",
           }}

@@ -6,6 +6,8 @@ export interface BarDatum {
   value: number;
 }
 
+const dataCache = new Map<string, BarDatum[]>();
+
 export interface NodeInsights {
   node:        string;
   platform:    string;
@@ -34,10 +36,10 @@ function rInt(lo: number, hi: number, rng: () => number) {
 }
 
 const METRIC_SEED: Record<Metric, number> = {
-  CPU: 10, GPU: 20, RAM: 30, PV: 40, Network: 50, Cloud: 60,
+  CPU: 101, GPU: 503, RAM: 307, PV: 709, Network: 1013, Cloud: 1301,
 };
 const DATE_OFFSET: Record<DateRange, number> = {
-  Today: 0, "7d": 100, "30d": 200,
+  Today: 0, "7d": 1337, "30d": 7019,
 };
 const PLATFORM_SEED: Record<string, number> = {
   AWS: 300, Azure: 400, GCP: 500, "On-Prem": 600,
@@ -56,11 +58,15 @@ const ISSUES     = [
 
 // ── Overview chart — utilisation % per resource type ─────────
 export function getOverviewData(dateRange: DateRange): BarDatum[] {
+  const key = `overview-${dateRange}`;
+  if (dataCache.has(key)) return dataCache.get(key)!;
   const metrics: Metric[] = ["CPU", "GPU", "RAM", "PV", "Network", "Cloud"];
-  return metrics.map((metric) => {
+  const result = metrics.map((metric) => {
     const rng = makeRng(METRIC_SEED[metric] + DATE_OFFSET[dateRange]);
-    return { label: metric, value: rInt(20, 92, rng) };
+    return { label: metric, value: rInt(15, 95, rng) };
   });
+  dataCache.set(key, result);
+  return result;
 }
 
 // ── Node names per platform ───────────────────────────────────
@@ -75,11 +81,17 @@ export function getNodeCostData(
   platform: string,
   dateRange: DateRange,
 ): BarDatum[] {
+  const key = `nodes-${platform}-${dateRange}`;
+  if (dataCache.has(key)) return dataCache.get(key)!;
   const names = getNodeNames(platform);
-  return names.map((name, i) => {
-    const rng = makeRng(PLATFORM_SEED[platform] + DATE_OFFSET[dateRange] + i * 53 + 11);
-    return { label: name, value: rInt(400, 4800, rng) };
+  const result = names.map((name, i) => {
+    const rng = makeRng(
+      PLATFORM_SEED[platform] + DATE_OFFSET[dateRange] + i * 53 + 11,
+    );
+    return { label: name, value: rInt(200, 9500, rng) };
   });
+  dataCache.set(key, result);
+  return result;
 }
 
 // ── Node optimization insights ────────────────────────────────

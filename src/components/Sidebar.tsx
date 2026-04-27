@@ -9,6 +9,8 @@ interface SidebarProps {
 export function Sidebar({ activePlatform, onSelect }: SidebarProps) {
   return (
     <aside
+      role="navigation"
+      aria-label="Cloud platform selector"
       style={{
         padding: "28px 10px",
         display: "flex",
@@ -19,7 +21,7 @@ export function Sidebar({ activePlatform, onSelect }: SidebarProps) {
       {/* Label */}
       <p
         style={{
-          fontSize: "0.68rem",
+          fontSize: "0.82rem",
           fontWeight: 600,
           letterSpacing: "0.1em",
           textTransform: "uppercase",
@@ -40,6 +42,7 @@ export function Sidebar({ activePlatform, onSelect }: SidebarProps) {
             key={platform}
             onClick={() => onSelect(platform)}
             aria-pressed={isActive}
+            aria-current={isActive ? "page" : undefined}
             style={{
               display: "flex",
               alignItems: "center",
@@ -57,7 +60,7 @@ export function Sidebar({ activePlatform, onSelect }: SidebarProps) {
                 ? tokens.colors.textPrimary
                 : tokens.colors.textSecondary,
               cursor: "pointer",
-              fontSize: "0.82rem",
+              fontSize: "0.95rem",
               fontFamily: "inherit",
               fontWeight: isActive ? 600 : 400,
               textAlign: "left",

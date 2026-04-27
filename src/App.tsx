@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Header }        from "./components/Header";
-import { Sidebar }       from "./components/Sidebar";
-import { DrillChart }    from "./components/DrillChart";
+import { Header } from "./components/Header";
+import { Sidebar } from "./components/Sidebar";
+import { DrillChart } from "./components/DrillChart";
 import { InsightsPanel } from "./components/InsightsPanel";
-import { useData }       from "./hooks/useData";
+import { useData } from "./hooks/useData";
 import type { DateRange, Theme, Platform } from "./tokens";
 import { tokens } from "./tokens";
 
@@ -13,19 +13,19 @@ interface SelectedNode { node: string; platform: Platform; }
 type AnimDir = "enter" | "from-right" | "from-left";
 
 const ANIM_CLASS: Record<AnimDir, string> = {
-  "enter":      "anim-chart-enter",
+  "enter": "anim-chart-enter",
   "from-right": "anim-panel-right",
-  "from-left":  "anim-panel-left",
+  "from-left": "anim-panel-left",
 };
 
 export default function App() {
-  const [theme, setTheme]                   = useState<Theme>("dark");
-  const [dateRange, setDateRange]           = useState<DateRange>("30d");
+  const [theme, setTheme] = useState<Theme>("dark");
+  const [dateRange, setDateRange] = useState<DateRange>("30d");
   const [activePlatform, setActivePlatform] = useState<Platform | null>(null);
-  const [selectedNode, setSelectedNode]     = useState<SelectedNode | null>(null);
-  const [animDir, setAnimDir]               = useState<AnimDir>("enter");
+  const [selectedNode, setSelectedNode] = useState<SelectedNode | null>(null);
+  const [animDir, setAnimDir] = useState<AnimDir>("enter");
   // panelKey forces remount → restarts CSS animation on every stage switch
-  const [panelKey, setPanelKey]             = useState(0);
+  const [panelKey, setPanelKey] = useState(0);
 
   useEffect(() => {
     document.documentElement.classList.toggle("light", theme === "light");
@@ -78,6 +78,32 @@ export default function App() {
       flexDirection: "column",
       transition: "background 0.3s ease",
     }}>
+      <a
+        href="#main-content"
+        style={{
+          position: "absolute",
+          top: -999,
+          left: -999,
+          padding: "10px 20px",
+          background: tokens.colors.accent,
+          color: tokens.colors.accentText,
+          borderRadius: tokens.radius.md,
+          fontWeight: 600,
+          fontSize: "0.9rem",
+          zIndex: 999,
+          transition: "top 0.2s ease, left 0.2s ease",
+        }}
+        onFocus={(e) => {
+          (e.currentTarget as HTMLElement).style.top = "12px";
+          (e.currentTarget as HTMLElement).style.left = "12px";
+        }}
+        onBlur={(e) => {
+          (e.currentTarget as HTMLElement).style.top = "-999px";
+          (e.currentTarget as HTMLElement).style.left = "-999px";
+        }}
+      >
+        Skip to main content
+      </a>
       {/* Header */}
       <Header
         dateRange={dateRange}
@@ -103,14 +129,13 @@ export default function App() {
         </div>
 
         {/* Main */}
-        <main style={{
+        <main id="main-content" style={{
           flex: 1,
           minWidth: 0,
           padding: "36px 32px 60px",
           display: "flex",
           flexDirection: "column",
           gap: 14,
-          // clip so sliding panels don't overflow during animation
           overflow: "hidden",
         }}>
           {status === "error" && (
@@ -125,12 +150,6 @@ export default function App() {
               API unavailable — showing locally generated data.
             </div>
           )}
-
-          {/*
-            key={panelKey} → remounts the card on every stage change
-            className     → picks the right entrance animation
-            overflow hidden → clips the slide so nothing bleeds outside
-          */}
           <div
             key={panelKey}
             className={ANIM_CLASS[animDir]}

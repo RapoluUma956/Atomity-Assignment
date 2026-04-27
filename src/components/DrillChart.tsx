@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Cell, LabelList,
+  Tooltip, ResponsiveContainer, Cell,
 } from "recharts";
 import { tokens } from "../tokens";
 import type { DateRange, Platform } from "../tokens";
@@ -25,7 +25,7 @@ function CustomTooltip({ active, payload, label, isDollar }: {
       border: `1px solid ${tokens.colors.borderPanel}`,
       borderRadius: tokens.radius.md,
       padding: "7px 13px",
-      fontSize: "0.78rem",
+      fontSize: "0.9rem",
       color: tokens.colors.textPrimary,
       boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
     }}>
@@ -47,11 +47,11 @@ function ChevronLeft() {
 
 // ── Props ─────────────────────────────────────────────────────
 interface DrillChartProps {
-  dateRange:      DateRange;
-  seedOffset:     number;
-  isLoading:      boolean;
+  dateRange: DateRange;
+  seedOffset: number;
+  isLoading: boolean;
   activePlatform: Platform | null;
-  onNodeClick:    (node: string, platform: Platform) => void;
+  onNodeClick: (node: string, platform: Platform) => void;
 }
 
 // ── Component ─────────────────────────────────────────────────
@@ -61,24 +61,21 @@ export function DrillChart({
   const view: "overview" | "nodes" = activePlatform ? "nodes" : "overview";
   const isDollar = view === "nodes";
 
-  // Compute data immediately — no deferred swap
   const chartData: BarDatum[] = activePlatform
     ? getNodeCostData(activePlatform, dateRange)
     : getOverviewData(dateRange);
 
-  // animationKey forces React to remount the chart wrapper,
-  // replaying the CSS entrance animation cleanly on every change.
   const [animationKey, setAnimationKey] = useState(1);
   const prevPlatformRef = useRef<Platform | null>(null);
-  const prevDateRef     = useRef<DateRange>(dateRange);
+  const prevDateRef = useRef<DateRange>(dateRange);
 
   useEffect(() => {
     const platformChanged = prevPlatformRef.current !== activePlatform;
-    const dateChanged     = prevDateRef.current !== dateRange;
+    const dateChanged = prevDateRef.current !== dateRange;
     if (platformChanged || dateChanged) {
       setAnimationKey((k) => k + 1);
       prevPlatformRef.current = activePlatform;
-      prevDateRef.current     = dateRange;
+      prevDateRef.current = dateRange;
     }
   }, [activePlatform, dateRange, seedOffset]);
 
@@ -101,16 +98,15 @@ export function DrillChart({
     ? (v: number) => `$${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`
     : (v: number) => `${v}%`;
 
-  const labelFormatter = isDollar
-    ? (v: number) => `$${v.toLocaleString()}`
-    : (v: number) => `${v}%`;
 
   return (
-    <section style={{ padding: "24px 28px 28px", display: "flex", flexDirection: "column" }}>
-
-      {/* Breadcrumb — always visible, transitions via color */}
+    <section
+      aria-live="polite"
+      aria-label={view === "overview" ? "Overview chart" : `${activePlatform} nodes chart`}
+      style={{ padding: "24px 28px 28px", display: "flex", flexDirection: "column" }}
+    >
       <nav aria-label="Breadcrumb" style={{ marginBottom: 20 }}>
-        <ol style={{ display: "flex", alignItems: "center", gap: 6, listStyle: "none", fontSize: "0.78rem" }}>
+        <ol style={{ display: "flex", alignItems: "center", gap: 6, listStyle: "none", fontSize: "0.9rem" }}>
           {breadcrumb.map((crumb, i) => {
             const isLast = i === breadcrumb.length - 1;
             return (
@@ -131,7 +127,7 @@ export function DrillChart({
 
       {/* Section label */}
       <p style={{
-        fontSize: "0.68rem",
+        fontSize: "0.82rem",
         fontWeight: 600,
         letterSpacing: "0.1em",
         textTransform: "uppercase",
@@ -154,11 +150,7 @@ export function DrillChart({
           ))}
         </div>
       ) : (
-        /*
-          key={animationKey} causes React to fully remount this div
-          on every platform/date change, replaying .anim-chart-enter
-          from scratch — clean entrance, no flicker, no data flash.
-        */
+
         <div
           key={animationKey}
           className="anim-chart-enter"
@@ -170,9 +162,9 @@ export function DrillChart({
               onClick={
                 view === "nodes"
                   ? (data) => {
-                      const label = data?.activeLabel;
-                      if (label && activePlatform) onNodeClick(label, activePlatform);
-                    }
+                    const label = data?.activeLabel;
+                    if (label && activePlatform) onNodeClick(label, activePlatform);
+                  }
                   : undefined
               }
               style={{ cursor: view === "nodes" ? "pointer" : "default" }}
@@ -182,14 +174,14 @@ export function DrillChart({
                 dataKey="label"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: tokens.colors.textSecondary, fontSize: 12, fontFamily: "inherit" }}
+                tick={{ fill: tokens.colors.textSecondary, fontSize: 13, fontFamily: "inherit" }}
                 dy={10}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={yFormatter}
-                tick={{ fill: tokens.colors.textMuted, fontSize: 11, fontFamily: "inherit" }}
+                tick={{ fill: tokens.colors.textMuted, fontSize: 12, fontFamily: "inherit" }}
                 width={56}
               />
               <Tooltip
@@ -202,9 +194,68 @@ export function DrillChart({
                 maxBarSize={80}
                 onMouseEnter={(d: { label?: string }) => setHoveredBar(d?.label ?? null)}
                 onMouseLeave={() => setHoveredBar(null)}
-                isAnimationActive
-                animationDuration={800}
-                animationEasing="ease-in-out"
+                isAnimationActive={false}
+                shape={(props: any) => {
+                  const { x, y, width, height, value } = props;
+                  const label = props.label ?? props.name ?? props.tooltipPayload?.[0]?.payload?.label;
+                  const isHovered = hoveredBar === label;
+                  const isNodes = view === "nodes";
+
+                  return (
+                    <g>
+                      <rect
+                        x={x}
+                        y={y}
+                        width={width}
+                        height={height}
+                        rx={5}
+                        ry={5}
+                        fill={isHovered ? tokens.colors.barHover : tokens.colors.bar}
+                      />
+                      <foreignObject x={x} y={y} width={width} height={height}>
+                        <button
+                          // @ts-ignore — xmlns needed for foreignObject context
+                          xmlns="http://www.w3.org/1999/xhtml"
+                          tabIndex={0}
+                          aria-label={
+                            isNodes
+                              ? `${label}, cost $${value?.toLocaleString()}, click to view optimization insights`
+                              : `${label}, utilisation ${value}%`
+                          }
+                          onClick={() => {
+                            if (isNodes && activePlatform && label) {
+                              onNodeClick(label, activePlatform);
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              if (isNodes && activePlatform && label) {
+                                onNodeClick(label, activePlatform);
+                              }
+                            }
+                          }}
+                          onFocus={() => setHoveredBar(label)}
+                          onBlur={() => setHoveredBar(null)}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            background: "transparent",
+                            border: "none",
+                            cursor: isNodes ? "pointer" : "default",
+                            outline: "none",
+                            display: "block",
+                          }}
+                          onFocusCapture={(e) => {
+                            const rect = e.currentTarget.previousElementSibling as SVGRectElement;
+                            if (rect) rect.setAttribute("stroke", tokens.colors.accent);
+                            if (rect) rect.setAttribute("stroke-width", "2");
+                          }}
+                        />
+                      </foreignObject>
+                    </g>
+                  );
+                }}
               >
                 {chartData.map((entry) => (
                   <Cell
@@ -218,17 +269,15 @@ export function DrillChart({
         </div>
       )}
 
-      {/* Hint */}
       <p style={{
         textAlign: "center",
-        fontSize: "0.72rem",
+        fontSize: "0.88rem",
         color: tokens.colors.textMuted,
         marginTop: 12,
       }}>
         {hintText}
       </p>
 
-      {/* Back button — nodes view only */}
       {view === "nodes" && (
         <div style={{
           marginTop: 20,
@@ -247,7 +296,7 @@ export function DrillChart({
               background: tokens.colors.bgBtn,
               color: tokens.colors.textSecondary,
               cursor: "pointer",
-              fontSize: "0.78rem",
+              fontSize: "0.9rem",
               fontFamily: "inherit",
               transition: "background 0.18s ease, color 0.18s ease",
             }}
