@@ -113,10 +113,10 @@ export default function App() {
       />
 
       {/* Body */}
-      <div style={{ flex: 1, display: "flex" }}>
+      <div className="layout-body" style={{ flex: 1, display: "flex" }}>
 
         {/* Sidebar */}
-        <div style={{
+        <div className="layout-sidebar" style={{
           width: 160,
           flexShrink: 0,
           background: tokens.colors.bgPanel,
@@ -129,7 +129,7 @@ export default function App() {
         </div>
 
         {/* Main */}
-        <main id="main-content" style={{
+        <main id="main-content" className="layout-main" style={{
           flex: 1,
           minWidth: 0,
           padding: "36px 32px 60px",

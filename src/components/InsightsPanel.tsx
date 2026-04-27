@@ -97,7 +97,7 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
       </p>
 
       {/* 4 metric cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+      <div className="insights-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
         <MetricCard label="CPU Usage"    value={`${data.cpuUsage}m`} />
         <MetricCard label="CPU Request"  value={`${data.cpuRequest}m`} />
         <MetricCard label="Mem Usage"    value={`${data.memUsageMiB} MiB`} />
@@ -139,7 +139,8 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
         overflow: "hidden",
       }}>
         {/* Table head */}
-        <div style={{
+        <div className="insights-table-head" 
+          style={{
           display: "grid",
           gridTemplateColumns: "1fr 1.4fr 1.6fr 0.8fr",
           padding: "8px 16px",
@@ -163,6 +164,7 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
         {data.optimizations.map((row, i) => (
           <div
             key={i}
+            className="insights-table-row"
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1.4fr 1.6fr 0.8fr",
