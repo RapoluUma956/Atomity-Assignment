@@ -42,9 +42,7 @@ const METRIC_SEED: Record<Metric, number> = {
 const DATE_OFFSET: Record<DateRange, number> = {
   Today: 0, "7d": 1337, "30d": 7019,
 };
-// const PLATFORM_SEED: Record<string, number> = {
-//   AWS: 1237, Azure: 45631, GCP: 89423, "On-Prem": 134897,
-// };
+
 const PLATFORM_SEED: Record<string, number> = Object.fromEntries(
   PLATFORMS.map((p) => {
     const base = p.split("").reduce((a, c) => a + c.charCodeAt(0) * 31, 0);

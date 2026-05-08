@@ -1,4 +1,3 @@
-import { tokens } from "../tokens";
 import type { Platform } from "../tokens";
 import { getNodeInsights } from "../data";
 import type { DateRange } from "../tokens";
@@ -13,31 +12,23 @@ interface InsightsPanelProps {
 // ── Metric card ───────────────────────────────────────────────
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{
-      background: tokens.colors.bgSurface,
-      border: `1px solid ${tokens.colors.border}`,
-      borderRadius: tokens.radius.lg,
-      padding: "14px 16px",
-      display: "flex",
-      flexDirection: "column",
-      gap: 6,
-    }}>
-      <span style={{
-        fontSize: "0.8rem",
-        fontWeight: 600,
-        letterSpacing: "0.1em",
-        textTransform: "uppercase",
-        color: tokens.colors.textMuted,
-      }}>
+    <div
+      className="flex flex-col gap-1.5 p-4 rounded-lg border"
+      style={{
+        background: "var(--color-bg-surface)",
+        borderColor: "var(--color-border)",
+      }}
+    >
+      <span
+        className="text-[0.8rem] font-semibold tracking-[0.1em] uppercase"
+        style={{ color: "var(--color-text-muted)" }}
+      >
         {label}
       </span>
-      <span style={{
-        fontSize: "1.6rem",
-        fontWeight: 600,
-        color: tokens.colors.textPrimary,
-        fontFamily: "inherit",
-        lineHeight: 1.2,
-      }}>
+      <span
+        className="text-[1.6rem] font-semibold leading-[1.2] font-[inherit]"
+        style={{ color: "var(--color-text-primary)" }}
+      >
         {value}
       </span>
     </div>
@@ -57,25 +48,25 @@ function ChevronLeft() {
 // ── Main panel ────────────────────────────────────────────────
 export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPanelProps) {
   const data = getNodeInsights(platform, node, dateRange);
-
-  // Breadcrumb: overview / platform / node
   const breadcrumb = ["overview", platform, node];
 
   return (
-    <section style={{ padding: "24px 28px 32px", display: "flex", flexDirection: "column", gap: 22 }}>
+    <section className="flex flex-col gap-[22px] px-7 pt-6 pb-8">
 
       {/* Breadcrumb */}
       <nav aria-label="Breadcrumb">
-        <ol style={{ display: "flex", alignItems: "center", gap: 6, listStyle: "none", fontSize: "0.9rem" }}>
+        <ol className="flex items-center gap-1.5 list-none text-[0.9rem]">
           {breadcrumb.map((crumb, i) => {
             const isLast = i === breadcrumb.length - 1;
             return (
-              <li key={`${crumb}-${i}`} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                {i > 0 && <span style={{ color: tokens.colors.textMuted }}>/</span>}
-                <span style={{
-                  color: isLast ? tokens.colors.accent : tokens.colors.textMuted,
-                  fontWeight: isLast ? 600 : 400,
-                }}>
+              <li key={`${crumb}-${i}`} className="flex items-center gap-1.5">
+                {i > 0 && <span style={{ color: "var(--color-text-muted)" }}>/</span>}
+                <span
+                  style={{
+                    color: isLast ? "var(--color-accent)" : "var(--color-text-muted)",
+                    fontWeight: isLast ? 600 : 400,
+                  }}
+                >
                   {crumb}
                 </span>
               </li>
@@ -85,76 +76,63 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
       </nav>
 
       {/* Section label */}
-      <p style={{
-        fontSize: "0.82rem",
-        fontWeight: 600,
-        letterSpacing: "0.1em",
-        textTransform: "uppercase",
-        color: tokens.colors.textMuted,
-        marginTop: -12,
-      }}>
+      <p
+        className="text-[0.82rem] font-semibold tracking-[0.1em] uppercase -mt-3"
+        style={{ color: "var(--color-text-muted)" }}
+      >
         {node} — optimization insights
       </p>
 
       {/* 4 metric cards */}
-      <div className="insights-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-        <MetricCard label="CPU Usage"    value={`${data.cpuUsage}m`} />
-        <MetricCard label="CPU Request"  value={`${data.cpuRequest}m`} />
-        <MetricCard label="Mem Usage"    value={`${data.memUsageMiB} MiB`} />
-        <MetricCard label="Mem Request"  value={`${(data.memRequestMiB / 1024).toFixed(1)} GiB`} />
+      <div className="insights-grid grid grid-cols-4 gap-3">
+        <MetricCard label="CPU Usage"   value={`${data.cpuUsage}m`} />
+        <MetricCard label="CPU Request" value={`${data.cpuRequest}m`} />
+        <MetricCard label="Mem Usage"   value={`${data.memUsageMiB} MiB`} />
+        <MetricCard label="Mem Request" value={`${(data.memRequestMiB / 1024).toFixed(1)} GiB`} />
       </div>
 
       {/* Estimated savings highlight */}
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "12px 18px",
-        background: tokens.colors.accentDim,
-        border: `1px solid color-mix(in srgb, ${tokens.colors.accent} 30%, transparent)`,
-        borderRadius: tokens.radius.lg,
-      }}>
-        <span style={{
-          fontSize: "0.85rem",
-          fontWeight: 600,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: tokens.colors.textMuted,
-        }}>
+      <div
+        className="flex items-center justify-between px-[18px] py-3 rounded-lg border"
+        style={{
+          background: "var(--color-accent-dim)",
+          borderColor: `color-mix(in srgb, var(--color-accent) 30%, transparent)`,
+        }}
+      >
+        <span
+          className="text-[0.85rem] font-semibold tracking-[0.08em] uppercase"
+          style={{ color: "var(--color-text-muted)" }}
+        >
           Estimated savings
         </span>
-        <span style={{
-          fontSize: "1.5rem",
-          fontWeight: 700,
-          color: tokens.colors.accent,
-        }}>
+        <span
+          className="text-[1.5rem] font-bold"
+          style={{ color: "var(--color-accent)" }}
+        >
           ${data.estimatedSavings.toLocaleString()} / mo
         </span>
       </div>
 
       {/* Optimization table */}
-      <div style={{
-        border: `1px solid ${tokens.colors.border}`,
-        borderRadius: tokens.radius.lg,
-        overflow: "hidden",
-      }}>
+      <div
+        className="rounded-lg overflow-hidden border"
+        style={{ borderColor: "var(--color-border)" }}
+      >
         {/* Table head */}
-        <div className="insights-table-head" 
+        <div
+          className="insights-table-head grid gap-0 px-4 py-2 border-b"
           style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1.4fr 1.6fr 0.8fr",
-          padding: "8px 16px",
-          background: tokens.colors.bgSurface,
-          borderBottom: `1px solid ${tokens.colors.border}`,
-        }}>
+            gridTemplateColumns: "1fr 1.4fr 1.6fr 0.8fr",
+            background: "var(--color-bg-surface)",
+            borderColor: "var(--color-border)",
+          }}
+        >
           {["Namespace", "Workload", "Issue", "Savings / mo"].map((h) => (
-            <span key={h} style={{
-              fontSize: "0.8rem",
-              fontWeight: 600,
-              letterSpacing: "0.09em",
-              textTransform: "uppercase",
-              color: tokens.colors.textMuted,
-            }}>
+            <span
+              key={h}
+              className="text-[0.8rem] font-semibold tracking-[0.09em] uppercase"
+              style={{ color: "var(--color-text-muted)" }}
+            >
               {h}
             </span>
           ))}
@@ -164,33 +142,30 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
         {data.optimizations.map((row, i) => (
           <div
             key={i}
-            className="insights-table-row"
+            className="insights-table-row grid px-4 py-2.5 transition-colors duration-150"
             style={{
-              display: "grid",
               gridTemplateColumns: "1fr 1.4fr 1.6fr 0.8fr",
-              padding: "10px 16px",
               borderBottom: i < data.optimizations.length - 1
-                ? `1px solid ${tokens.colors.border}`
+                ? "1px solid var(--color-border)"
                 : "none",
-              transition: "background 0.15s ease",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = tokens.colors.bgSurface;
+              (e.currentTarget as HTMLElement).style.background = "var(--color-bg-surface)";
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLElement).style.background = "transparent";
             }}
           >
-            <span style={{ fontSize: "0.9rem", color: tokens.colors.textMuted, fontFamily: "inherit" }}>
+            <span className="text-[0.9rem] font-[inherit]" style={{ color: "var(--color-text-muted)" }}>
               {row.namespace}
             </span>
-            <span style={{ fontSize: "0.9rem", color: tokens.colors.textSecondary }}>
+            <span className="text-[0.9rem]" style={{ color: "var(--color-text-secondary)" }}>
               {row.workload}
             </span>
-            <span style={{ fontSize: "0.9rem", color: tokens.colors.textPrimary }}>
+            <span className="text-[0.9rem]" style={{ color: "var(--color-text-primary)" }}>
               {row.issue}
             </span>
-            <span style={{ fontSize: "0.9rem", color: tokens.colors.accent, fontWeight: 600 }}>
+            <span className="text-[0.9rem] font-semibold" style={{ color: "var(--color-accent)" }}>
               ${row.savings}
             </span>
           </div>
@@ -198,30 +173,24 @@ export function InsightsPanel({ node, platform, dateRange, onBack }: InsightsPan
       </div>
 
       {/* Back button */}
-      <div style={{ marginTop: 4 }}>
+      <div className="mt-1">
         <button
+          id="back-to-nodes-btn"
           onClick={onBack}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border
+                     cursor-pointer text-[0.9rem] font-[inherit] transition-colors duration-[180ms]"
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "6px 14px",
-            borderRadius: tokens.radius.md,
-            border: `1px solid ${tokens.colors.border}`,
-            background: tokens.colors.bgBtn,
-            color: tokens.colors.textSecondary,
-            cursor: "pointer",
-            fontSize: "0.9rem",
-            fontFamily: "inherit",
-            transition: "background 0.18s ease, color 0.18s ease",
+            background: "var(--color-bg-btn)",
+            color: "var(--color-text-secondary)",
+            borderColor: "var(--color-border)",
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.background = tokens.colors.bgBtnHover;
-            (e.currentTarget as HTMLElement).style.color = tokens.colors.textPrimary;
+            (e.currentTarget as HTMLElement).style.background = "var(--color-bg-btn-hover)";
+            (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)";
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.background = tokens.colors.bgBtn;
-            (e.currentTarget as HTMLElement).style.color = tokens.colors.textSecondary;
+            (e.currentTarget as HTMLElement).style.background = "var(--color-bg-btn)";
+            (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)";
           }}
         >
           <ChevronLeft /> back to {platform} nodes

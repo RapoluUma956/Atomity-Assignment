@@ -29,14 +29,14 @@ export type Metric    = "CPU" | "GPU" | "RAM" | "PV" | "Network" | "Cloud";
 export type DateRange = "Today" | "7d" | "30d";
 export type Theme     = "dark" | "light";
 
-// ── Add any new platform name here — color is auto-assigned ──
+
 export const PLATFORMS = ["AWS", "Azure", "GCP", "On-Prem", "xyz"] as const;
 export type Platform = (typeof PLATFORMS)[number];
 
 export const METRICS: Metric[]        = ["CPU", "GPU", "RAM", "PV", "Network", "Cloud"];
 export const DATE_RANGES: DateRange[] = ["Today", "7d", "30d"];
 
-// ── Palette — cycles automatically for any number of platforms ─
+
 const PLATFORM_COLOR_PALETTE: string[] = [
   "#FF9900", // amber   (AWS)
   "#0ea5e9", // sky     (Azure)

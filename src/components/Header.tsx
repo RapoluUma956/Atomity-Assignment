@@ -1,4 +1,4 @@
-import { tokens, DATE_RANGES } from "../tokens";
+import { DATE_RANGES } from "../tokens";
 import type { DateRange, Theme } from "../tokens";
 
 interface HeaderProps {
@@ -8,7 +8,6 @@ interface HeaderProps {
   onThemeToggle: () => void;
 }
 
-// Sun icon for light mode
 function SunIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
@@ -20,7 +19,6 @@ function SunIcon() {
   );
 }
 
-// Moon icon for dark mode
 function MoonIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
@@ -35,67 +33,47 @@ export function Header({ dateRange, onDateChange, theme, onThemeToggle }: Header
     <header
       role="banner"
       aria-label="Atomity application header"
+      className="flex items-center justify-between px-7 py-4 sticky top-0 z-50 transition-colors duration-300 border-b"
       style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "16px 28px",
-        background: tokens.colors.bgPanel,
-        borderBottom: `1px solid ${tokens.colors.borderPanel}`,
-        position: "sticky",
-        top: 0,
-        zIndex: 50,
-        transition: "background 0.3s ease",
+        background: "var(--color-bg-panel)",
+        borderColor: "var(--color-border-panel)",
       }}
     >
-      {/* Logo */}
       <span
-        style={{
-          fontSize: "1.05rem",
-          fontWeight: 700,
-          letterSpacing: "0.04em",
-          color: tokens.colors.textPrimary,
-        }}
+        className="text-[1.05rem] font-bold tracking-[0.04em]"
+        style={{ color: "var(--color-text-primary)" }}
       >
         Atomity
       </span>
 
       {/* Right controls */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <div className="flex items-center gap-2">
         {/* Date range pills */}
         <nav
           aria-label="Date range"
           aria-live="polite"
-          style={{
-            display: "flex",
-            background: tokens.colors.bgSurface,
-            borderRadius: tokens.radius.lg,
-            padding: 3,
-            gap: 2,
-          }}
+          className="flex rounded-lg p-[3px] gap-[2px]"
+          style={{ background: "var(--color-bg-surface)" }}
         >
           {DATE_RANGES.map((d) => {
             const isActive = d === dateRange;
             return (
               <button
                 key={d}
+                id={`date-range-${d}`}
                 onClick={() => onDateChange(d)}
                 aria-pressed={isActive}
+                className={`px-3.5 py-[5px] rounded-md border-none cursor-pointer text-[0.95rem]
+                            font-[inherit] outline-none transition-all duration-200
+                            ${isActive ? "font-semibold" : "font-normal"}
+                           `}
                 style={{
-                  padding: "5px 14px",
-                  borderRadius: tokens.radius.md,
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "0.95rem",
-                  fontFamily: "inherit",
-                  fontWeight: isActive ? 600 : 400,
-                  background: isActive ? tokens.colors.accent : "transparent",
-                  color: isActive ? tokens.colors.accentText : tokens.colors.textSecondary,
-                  transition: "background 0.2s ease, color 0.2s ease",
-                  outline: "none",
+                  background: isActive ? "var(--color-accent)" : "transparent",
+                  color: isActive ? "var(--color-accent-text)" : "var(--color-text-secondary)",
                 }}
                 onFocus={(e) => {
-                  if (!isActive) (e.currentTarget as HTMLElement).style.outline = `2px solid ${tokens.colors.accent}`;
+                  if (!isActive)
+                    (e.currentTarget as HTMLElement).style.outline = "2px solid var(--color-accent)";
                 }}
                 onBlur={(e) => {
                   (e.currentTarget as HTMLElement).style.outline = "none";
@@ -108,32 +86,27 @@ export function Header({ dateRange, onDateChange, theme, onThemeToggle }: Header
         </nav>
 
         {/* Divider */}
-        <div style={{ width: 1, height: 24, background: tokens.colors.border }} />
+        <div className="w-px h-6" style={{ background: "var(--color-border)" }} />
 
         {/* Theme toggle */}
         <button
+          id="theme-toggle"
           onClick={onThemeToggle}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+          className="flex items-center justify-center w-[34px] h-[34px] rounded-md border
+                     cursor-pointer transition-colors duration-200"
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 34,
-            height: 34,
-            borderRadius: tokens.radius.md,
-            border: `1px solid ${tokens.colors.border}`,
-            background: tokens.colors.bgBtn,
-            color: tokens.colors.textSecondary,
-            cursor: "pointer",
-            transition: "background 0.2s ease, color 0.2s ease",
+            background: "var(--color-bg-btn)",
+            color: "var(--color-text-secondary)",
+            borderColor: "var(--color-border)",
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.background = tokens.colors.bgBtnHover;
-            (e.currentTarget as HTMLElement).style.color = tokens.colors.textPrimary;
+            (e.currentTarget as HTMLElement).style.background = "var(--color-bg-btn-hover)";
+            (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)";
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.background = tokens.colors.bgBtn;
-            (e.currentTarget as HTMLElement).style.color = tokens.colors.textSecondary;
+            (e.currentTarget as HTMLElement).style.background = "var(--color-bg-btn)";
+            (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)";
           }}
         >
           {theme === "dark" ? <SunIcon /> : <MoonIcon />}

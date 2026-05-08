@@ -1,24 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --color-bg: #111113;
-  --color-bg-panel: #18181b;
-  --color-bg-surface: #1e1e23;
-  --color-bg-btn: #27272a;
+  --color-bg:           #111113;
+  --color-bg-panel:     #18181b;
+  --color-bg-surface:   #1e1e23;
+  --color-bg-btn:       #27272a;
   --color-bg-btn-hover: #3f3f46;
 
-  --color-accent: #2dd4bf;
-  --color-accent-dim: rgba(45, 212, 191, 0.12);
-  --color-accent-text: #111113;
+  --color-accent:       #2dd4bf;
+  --color-accent-dim:   rgba(45, 212, 191, 0.12);
+  --color-accent-text:  #111113;
 
-  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border:       rgba(255, 255, 255, 0.07);
   --color-border-panel: rgba(255, 255, 255, 0.11);
 
-  --color-text-primary: #ffffff;
+  --color-text-primary:   #ffffff;
   --color-text-secondary: #d4d4d8;
-  --color-text-muted: #a1a1aa;
+  --color-text-muted:     #a1a1aa;
 
-  --color-bar: rgba(45, 212, 191, 0.70);
+  --color-bar:       rgba(45, 212, 191, 0.70);
   --color-bar-hover: #2dd4bf;
-  --color-bar-bg: rgba(255, 255, 255, 0.04);
+  --color-bar-bg:    rgba(255, 255, 255, 0.04);
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -26,32 +30,31 @@
   --radius-xl: 22px;
 }
 
-/* ── Light mode ─────────────────────────────────────────── */
+/* ── Light mode overrides ───────────────────────────────────── */
 .light {
-  --color-bg: #f4f4f5;
-  --color-bg-panel: #ffffff;
-  --color-bg-surface: #f1f1f3;
-  --color-bg-btn: #e4e4e7;
+  --color-bg:           #f4f4f5;
+  --color-bg-panel:     #ffffff;
+  --color-bg-surface:   #f1f1f3;
+  --color-bg-btn:       #e4e4e7;
   --color-bg-btn-hover: #d4d4d8;
 
-  --color-accent: #0d9488;
-  --color-accent-dim: rgba(13, 148, 136, 0.10);
-  --color-accent-text: #ffffff;
+  --color-accent:       #0d9488;
+  --color-accent-dim:   rgba(13, 148, 136, 0.10);
+  --color-accent-text:  #ffffff;
 
-  --color-border: rgba(0, 0, 0, 0.07);
+  --color-border:       rgba(0, 0, 0, 0.07);
   --color-border-panel: rgba(0, 0, 0, 0.10);
 
-
-  --color-text-primary: #09090b;
+  --color-text-primary:   #09090b;
   --color-text-secondary: #27272a;
-  --color-text-muted: #52525b;
+  --color-text-muted:     #52525b;
 
-  --color-bar: rgba(13, 148, 136, 0.70);
+  --color-bar:       rgba(13, 148, 136, 0.70);
   --color-bar-hover: #0d9488;
-  --color-bar-bg: rgba(0, 0, 0, 0.04);
+  --color-bar-bg:    rgba(0, 0, 0, 0.04);
 }
 
-/* ── Base reset ─────────────────────────────────────────── */
+/* ── Base reset ─────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -67,123 +70,42 @@ html {
 body {
   background: var(--color-bg);
   color: var(--color-text-primary);
+  font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
   font-size: 16px;
   font-weight: 500;
-  font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
   -webkit-font-smoothing: antialiased;
   transition: background 0.3s ease, color 0.3s ease;
   min-block-size: 100vh;
 }
 
-/* ── Reduced motion ─────────────────────────────────────── */
+/* ── Reduced motion ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-/* ── Scrollbar ──────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 4px;
-}
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--color-border-panel); border-radius: 99px; }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-border-panel);
-  border-radius: 99px;
-}
-
-/* ── Keyframes ──────────────────────────────────────────── */
-
-/* Chart content enters: fades in + rises slightly */
-@keyframes chartEnter {
-  from {
-    opacity: 0;
-    transform: translateY(80px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Panel (insights) enters from the right */
-@keyframes panelEnterRight {
-  from {
-    opacity: 0;
-    transform: translateX(100px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Panel (chart) enters from the left (going back) */
-@keyframes panelEnterLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-100px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* ── Animation utility classes ──────────────────────────── */
-.anim-chart-enter {
-  animation: chartEnter 2s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.anim-panel-right {
-  animation: panelEnterRight 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.anim-panel-left {
-  animation: panelEnterLeft 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
+/* ── Responsive layout helpers (sm breakpoint = 640px) ──────── */
 @media (max-width: 640px) {
-  .layout-body {
-    flex-direction: column;
-  }
+  .layout-body    { flex-direction: column; }
   .layout-sidebar {
     width: 100% !important;
     border-right: none !important;
     border-bottom: 1px solid var(--color-border);
-    flex-direction: row;
-    overflow-x: auto;
   }
-  .layout-sidebar aside {
-    flex-direction: row;
-    padding: 12px 10px;
-    gap: 6px;
-  }
-  .layout-main {
-    padding: 16px 16px 40px !important;
-  }
-  .insights-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
+  .layout-sidebar aside { padding: 16px 10px; gap: 6px; }
+  .layout-main    { padding: 16px 16px 40px !important; }
+  .insights-grid  { grid-template-columns: repeat(2, 1fr) !important; }
   .insights-table-head,
-  .insights-table-row {
-    grid-template-columns: 1fr 1fr !important;
-  }
+  .insights-table-row { grid-template-columns: 1fr 1fr !important; }
   .insights-table-head span:nth-child(3),
   .insights-table-head span:nth-child(4),
-  .insights-table-row span:nth-child(3),
-  .insights-table-row span:nth-child(4) {
-    display: none;
-  }
+  .insights-table-row  span:nth-child(3),
+  .insights-table-row  span:nth-child(4) { display: none; }
 }

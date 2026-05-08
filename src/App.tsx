@@ -5,17 +5,15 @@ import { DrillChart } from "./components/DrillChart";
 import { InsightsPanel } from "./components/InsightsPanel";
 import { useData } from "./hooks/useData";
 import type { DateRange, Theme, Platform } from "./tokens";
-import { tokens } from "./tokens";
 
 interface SelectedNode { node: string; platform: Platform; }
-
 
 type AnimDir = "enter" | "from-right" | "from-left";
 
 const ANIM_CLASS: Record<AnimDir, string> = {
-  "enter": "anim-chart-enter",
-  "from-right": "anim-panel-right",
-  "from-left": "anim-panel-left",
+  "enter":      "animate-chart-enter",
+  "from-right": "animate-panel-right",
+  "from-left":  "animate-panel-left",
 };
 
 export default function App() {
@@ -44,14 +42,12 @@ export default function App() {
   }
 
   function handleNodeClick(node: string, platform: Platform) {
-    // Back signal from DrillChart back button
     if (node === "__back__") {
       setActivePlatform(null);
       setSelectedNode(null);
       nextPanel("enter");
       return;
     }
-    // Forward: go to insights
     setSelectedNode({ node, platform });
     nextPanel("from-right");
   }
@@ -70,39 +66,22 @@ export default function App() {
   const showInsights = selectedNode !== null;
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: tokens.colors.bg,
-      display: "flex",
-      flexDirection: "column",
-      transition: "background 0.3s ease",
-    }}>
+    <div className="min-h-screen flex flex-col transition-colors duration-300"
+      style={{ background: "var(--color-bg)" }}>
+
+      {/* Skip-to-content link */}
       <a
         href="#main-content"
+        className="absolute -top-[999px] -left-[999px] px-5 py-2.5 rounded-md font-semibold text-sm z-[999]
+                   focus:top-3 focus:left-3 transition-all duration-200"
         style={{
-          position: "absolute",
-          top: -999,
-          left: -999,
-          padding: "10px 20px",
-          background: tokens.colors.accent,
-          color: tokens.colors.accentText,
-          borderRadius: tokens.radius.md,
-          fontWeight: 600,
-          fontSize: "0.9rem",
-          zIndex: 999,
-          transition: "top 0.2s ease, left 0.2s ease",
-        }}
-        onFocus={(e) => {
-          (e.currentTarget as HTMLElement).style.top = "12px";
-          (e.currentTarget as HTMLElement).style.left = "12px";
-        }}
-        onBlur={(e) => {
-          (e.currentTarget as HTMLElement).style.top = "-999px";
-          (e.currentTarget as HTMLElement).style.left = "-999px";
+          background: "var(--color-accent)",
+          color: "var(--color-accent-text)",
         }}
       >
         Skip to main content
       </a>
+
       {/* Header */}
       <Header
         dateRange={dateRange}
@@ -112,51 +91,44 @@ export default function App() {
       />
 
       {/* Body */}
-      <div className="layout-body" style={{ flex: 1, display: "flex" }}>
+      <div className="layout-body flex flex-1">
 
         {/* Sidebar */}
-        <div className="layout-sidebar" style={{
-          width: 160,
-          flexShrink: 0,
-          background: tokens.colors.bgPanel,
-          borderRight: `1px solid ${tokens.colors.border}`,
-        }}>
-          <Sidebar
-            activePlatform={activePlatform}
-            onSelect={handlePlatformSelect}
-          />
+        <div
+          className="layout-sidebar w-40 shrink-0 border-r"
+          style={{
+            background: "var(--color-bg-panel)",
+            borderColor: "var(--color-border)",
+          }}
+        >
+          <Sidebar activePlatform={activePlatform} onSelect={handlePlatformSelect} />
         </div>
 
         {/* Main */}
-        <main id="main-content" className="layout-main" style={{
-          flex: 1,
-          minWidth: 0,
-          padding: "36px 32px 60px",
-          display: "flex",
-          flexDirection: "column",
-          gap: 14,
-          overflow: "hidden",
-        }}>
+        <main
+          id="main-content"
+          className="layout-main flex-1 min-w-0 px-8 pt-9 pb-16 flex flex-col gap-3.5 overflow-hidden"
+        >
           {status === "error" && (
-            <div role="alert" style={{
-              padding: "8px 14px",
-              borderRadius: tokens.radius.md,
-              background: "rgba(239,68,68,0.08)",
-              border: "1px solid rgba(239,68,68,0.2)",
-              color: "rgba(239,68,68,0.85)",
-              fontSize: "0.75rem",
-            }}>
+            <div
+              role="alert"
+              className="px-3.5 py-2 rounded-md text-xs border"
+              style={{
+                background: "rgba(239,68,68,0.08)",
+                borderColor: "rgba(239,68,68,0.2)",
+                color: "rgba(239,68,68,0.85)",
+              }}
+            >
               API unavailable — showing locally generated data.
             </div>
           )}
+
           <div
             key={panelKey}
-            className={ANIM_CLASS[animDir]}
+            className={`${ANIM_CLASS[animDir]} rounded-xl overflow-hidden border`}
             style={{
-              background: tokens.colors.bgPanel,
-              border: `1px solid ${tokens.colors.borderPanel}`,
-              borderRadius: tokens.radius.xl,
-              overflow: "hidden",
+              background: "var(--color-bg-panel)",
+              borderColor: "var(--color-border-panel)",
             }}
           >
             {showInsights ? (

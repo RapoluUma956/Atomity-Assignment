@@ -20,17 +20,16 @@ function CustomTooltip({ active, payload, label, isDollar }: {
     ? `$${payload[0].value.toLocaleString()}`
     : `${payload[0].value}%`;
   return (
-    <div style={{
-      background: tokens.colors.bgPanel,
-      border: `1px solid ${tokens.colors.borderPanel}`,
-      borderRadius: tokens.radius.md,
-      padding: "7px 13px",
-      fontSize: "0.9rem",
-      color: tokens.colors.textPrimary,
-      boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
-    }}>
-      <span style={{ color: tokens.colors.textSecondary }}>{label}: </span>
-      <span style={{ color: tokens.colors.accent, fontWeight: 600 }}>{val}</span>
+    <div
+      className="px-3.5 py-[7px] rounded-md text-[0.9rem] shadow-[0_8px_24px_rgba(0,0,0,0.35)] border"
+      style={{
+        background: "var(--color-bg-panel)",
+        borderColor: "var(--color-border-panel)",
+        color: "var(--color-text-primary)",
+      }}
+    >
+      <span style={{ color: "var(--color-text-secondary)" }}>{label}: </span>
+      <span className="font-semibold" style={{ color: "var(--color-accent)" }}>{val}</span>
     </div>
   );
 }
@@ -81,10 +80,7 @@ export function DrillChart({
 
   const [hoveredBar, setHoveredBar] = useState<string | null>(null);
 
-  // Breadcrumb
-  const breadcrumb = activePlatform
-    ? ["overview", activePlatform]
-    : ["overview"];
+  const breadcrumb = activePlatform ? ["overview", activePlatform] : ["overview"];
 
   const sectionLabel = view === "overview"
     ? "Unified overview — all clusters"
@@ -98,25 +94,27 @@ export function DrillChart({
     ? (v: number) => `$${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`
     : (v: number) => `${v}%`;
 
-
   return (
     <section
       aria-live="polite"
       aria-label={view === "overview" ? "Overview chart" : `${activePlatform} nodes chart`}
-      style={{ padding: "24px 28px 28px", display: "flex", flexDirection: "column" }}
+      className="flex flex-col px-7 pt-6 pb-7"
     >
-      <nav aria-label="Breadcrumb" style={{ marginBottom: 20 }}>
-        <ol style={{ display: "flex", alignItems: "center", gap: 6, listStyle: "none", fontSize: "0.9rem" }}>
+      {/* Breadcrumb */}
+      <nav aria-label="Breadcrumb" className="mb-5">
+        <ol className="flex items-center gap-1.5 list-none text-[0.9rem]">
           {breadcrumb.map((crumb, i) => {
             const isLast = i === breadcrumb.length - 1;
             return (
-              <li key={`${crumb}-${i}`} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                {i > 0 && <span style={{ color: tokens.colors.textMuted }}>/</span>}
-                <span style={{
-                  color: isLast ? tokens.colors.accent : tokens.colors.textMuted,
-                  fontWeight: isLast ? 600 : 400,
-                  transition: "color 0.35s ease",
-                }}>
+              <li key={`${crumb}-${i}`} className="flex items-center gap-1.5">
+                {i > 0 && <span style={{ color: "var(--color-text-muted)" }}>/</span>}
+                <span
+                  className="transition-colors duration-[350ms]"
+                  style={{
+                    color: isLast ? "var(--color-accent)" : "var(--color-text-muted)",
+                    fontWeight: isLast ? 600 : 400,
+                  }}
+                >
                   {crumb}
                 </span>
               </li>
@@ -126,37 +124,32 @@ export function DrillChart({
       </nav>
 
       {/* Section label */}
-      <p style={{
-        fontSize: "0.82rem",
-        fontWeight: 600,
-        letterSpacing: "0.1em",
-        textTransform: "uppercase",
-        color: tokens.colors.textMuted,
-        marginBottom: 18,
-        transition: "opacity 0.35s ease",
-      }}>
+      <p
+        className="text-[0.82rem] font-semibold tracking-[0.1em] uppercase mb-[18px] transition-opacity duration-[350ms]"
+        style={{ color: "var(--color-text-muted)" }}
+      >
         {sectionLabel}
       </p>
 
       {/* Loading skeleton */}
       {isLoading && chartData.length === 0 ? (
-        <div style={{ display: "flex", gap: 20, alignItems: "flex-end", height: 300 }}>
+        <div className="flex gap-5 items-end h-[300px]">
           {[65, 42, 78, 35, 55, 70].map((h, i) => (
-            <div key={i} style={{
-              flex: 1, height: `${h}%`,
-              borderRadius: tokens.radius.md,
-              background: tokens.colors.barBg,
-            }} />
+            <div
+              key={i}
+              className="flex-1 rounded-md"
+              style={{
+                height: `${h}%`,
+                background: "var(--color-bar-bg)",
+              }}
+            />
           ))}
         </div>
       ) : (
-
-        <div
-          key={animationKey}
-          className="anim-chart-enter"
-        >
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
+        <div key={animationKey} className="animate-chart-enter w-full overflow-x-auto pb-2">
+          <div className="min-w-[600px]">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
               data={chartData}
               margin={{ top: 26, right: 12, left: 10, bottom: 0 }}
               onClick={
@@ -207,17 +200,13 @@ export function DrillChart({
                   return (
                     <g>
                       <rect
-                        x={x}
-                        y={y}
-                        width={width}
-                        height={height}
-                        rx={5}
-                        ry={5}
+                        x={x} y={y} width={width} height={height}
+                        rx={5} ry={5}
                         fill={isHovered ? tokens.colors.barHover : tokens.colors.bar}
                       />
                       <foreignObject x={x} y={y} width={width} height={height}>
                         <button
-                          // @ts-ignore — xmlns needed for foreignObject context
+                          // @ts-ignore
                           xmlns="http://www.w3.org/1999/xhtml"
                           tabIndex={0}
                           aria-label={
@@ -269,47 +258,38 @@ export function DrillChart({
               </Bar>
             </BarChart>
           </ResponsiveContainer>
+          </div>
         </div>
       )}
 
-      <p style={{
-        textAlign: "center",
-        fontSize: "0.88rem",
-        color: tokens.colors.textMuted,
-        marginTop: 12,
-      }}>
+      {/* Hint */}
+      <p
+        className="text-center text-[0.88rem] mt-3"
+        style={{ color: "var(--color-text-muted)" }}
+      >
         {hintText}
       </p>
 
+      {/* Back button (nodes view) */}
       {view === "nodes" && (
-        <div style={{
-          marginTop: 20,
-          paddingTop: 16,
-          borderTop: `1px solid ${tokens.colors.border}`,
-        }}>
+        <div className="mt-5 pt-4 border-t" style={{ borderColor: "var(--color-border)" }}>
           <button
+            id="back-to-overview-btn"
             onClick={() => onNodeClick("__back__", activePlatform!)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border
+                       cursor-pointer text-[0.9rem] font-[inherit] transition-colors duration-[180ms]"
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "6px 14px",
-              borderRadius: tokens.radius.md,
-              border: `1px solid ${tokens.colors.border}`,
-              background: tokens.colors.bgBtn,
-              color: tokens.colors.textSecondary,
-              cursor: "pointer",
-              fontSize: "0.9rem",
-              fontFamily: "inherit",
-              transition: "background 0.18s ease, color 0.18s ease",
+              background: "var(--color-bg-btn)",
+              color: "var(--color-text-secondary)",
+              borderColor: "var(--color-border)",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = tokens.colors.bgBtnHover;
-              (e.currentTarget as HTMLElement).style.color = tokens.colors.textPrimary;
+              (e.currentTarget as HTMLElement).style.background = "var(--color-bg-btn-hover)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = tokens.colors.bgBtn;
-              (e.currentTarget as HTMLElement).style.color = tokens.colors.textSecondary;
+              (e.currentTarget as HTMLElement).style.background = "var(--color-bg-btn)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)";
             }}
           >
             <ChevronLeft /> back to overview
