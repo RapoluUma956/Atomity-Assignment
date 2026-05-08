@@ -36,7 +36,7 @@ export function Sidebar({ activePlatform, onSelect }: SidebarProps) {
       {PLATFORMS.map((platform) => {
         const isActive = activePlatform === platform;
         const { color } = PLATFORM_META[platform];
-
+        console.log("Rendering platform button:", platform, "isActive:", isActive);
         return (
           <button
             key={platform}

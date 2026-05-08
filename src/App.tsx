@@ -24,7 +24,6 @@ export default function App() {
   const [activePlatform, setActivePlatform] = useState<Platform | null>(null);
   const [selectedNode, setSelectedNode] = useState<SelectedNode | null>(null);
   const [animDir, setAnimDir] = useState<AnimDir>("enter");
-  // panelKey forces remount → restarts CSS animation on every stage switch
   const [panelKey, setPanelKey] = useState(0);
 
   useEffect(() => {

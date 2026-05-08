@@ -194,7 +194,10 @@ export function DrillChart({
                 maxBarSize={80}
                 onMouseEnter={(d: { label?: string }) => setHoveredBar(d?.label ?? null)}
                 onMouseLeave={() => setHoveredBar(null)}
-                isAnimationActive={false}
+                isAnimationActive={true}
+                animationBegin={0}
+                animationDuration={900}
+                animationEasing="ease-out"
                 shape={(props: any) => {
                   const { x, y, width, height, value } = props;
                   const label = props.label ?? props.name ?? props.tooltipPayload?.[0]?.payload?.label;

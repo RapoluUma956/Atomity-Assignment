@@ -1,5 +1,6 @@
 import type { Metric, DateRange } from "./tokens";
 export type { Platform } from "./tokens";
+import { PLATFORMS } from "./tokens";
 
 export interface BarDatum {
   label: string;
@@ -41,9 +42,15 @@ const METRIC_SEED: Record<Metric, number> = {
 const DATE_OFFSET: Record<DateRange, number> = {
   Today: 0, "7d": 1337, "30d": 7019,
 };
-const PLATFORM_SEED: Record<string, number> = {
-  AWS: 300, Azure: 400, GCP: 500, "On-Prem": 600,
-};
+// const PLATFORM_SEED: Record<string, number> = {
+//   AWS: 1237, Azure: 45631, GCP: 89423, "On-Prem": 134897,
+// };
+const PLATFORM_SEED: Record<string, number> = Object.fromEntries(
+  PLATFORMS.map((p) => {
+    const base = p.split("").reduce((a, c) => a + c.charCodeAt(0) * 31, 0);
+    return [p, (base * 6271 + 1) % 233280];
+  })
+);
 
 const NAMESPACES = ["default", "kube-system", "monitoring", "ingress-nginx", "ml-serving", "data-pipeline"];
 const WORKLOADS  = ["deploy/api-server", "sts/postgres", "deploy/redis", "ds/fluentd", "deploy/prometheus", "job/etl-runner"];
@@ -71,8 +78,10 @@ export function getOverviewData(dateRange: DateRange): BarDatum[] {
 
 // ── Node names per platform ───────────────────────────────────
 function getNodeNames(platform: string): string[] {
-  const rng   = makeRng(PLATFORM_SEED[platform] + 77);
-  const count = rInt(3, 6, rng);
+  const base = PLATFORM_SEED[platform]
+    ?? platform.split("").reduce((a, c) => a + c.charCodeAt(0) * 31, 0);
+  const rng   = makeRng((base * 6271 + 1) % 233280);
+  const count = rInt(3, 8, rng);
   return Array.from({ length: count }, (_, i) => `node-${i + 1}`);
 }
 
@@ -85,10 +94,8 @@ export function getNodeCostData(
   if (dataCache.has(key)) return dataCache.get(key)!;
   const names = getNodeNames(platform);
   const result = names.map((name, i) => {
-    const rng = makeRng(
-      PLATFORM_SEED[platform] + DATE_OFFSET[dateRange] + i * 53 + 11,
-    );
-    return { label: name, value: rInt(200, 9500, rng) };
+    const rng = makeRng((PLATFORM_SEED[platform] * 3517 + DATE_OFFSET[dateRange] * 1193 + i * 7919 + 11) % 233280);
+    return { label: name, value: rInt(500, 9500, rng) };
   });
   dataCache.set(key, result);
   return result;
