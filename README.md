@@ -4,9 +4,7 @@ This is my submission for the Atomity frontend assignment.
 
 I built a simple cloud dashboard where users can explore resource usage and costs in an interactive way. The main idea is to let users start from a high-level overview and then drill down step by step to see more detailed information.
 
-### Deployment Link: 
-
----
+### Deployment Link: https://atomity-assignment-six.vercel.app/
 
 ## Feature Chosen
 
